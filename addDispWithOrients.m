@@ -1,0 +1,10 @@
+startIds = goodTracks(:,12) == 1;
+basePositions = goodTracks(startIds,:);
+tracksDispOrients = zeros(length(goodTracks(:,1)),23);
+tracksDispOrients(:,1:13) = goodTracks;
+tracksDispOrients(:,14) = goodTracks(:,1) - basePositions(goodTracks(:,13),1);
+tracksDispOrients(:,15) = goodTracks(:,2) - basePositions(goodTracks(:,13),2);
+tracksDispOrients(:,16) = goodTracks(:,3) - basePositions(goodTracks(:,13),3);
+tracksDispOrients(:,17) = tracksDispOrients(:,14) .^ 2 + tracksDispOrients(:,15) .^ 2 +tracksDispOrients(:,16) .^ 2;
+tracksDispOrients(:,18:20) = cross(goodTracks(:,9:11),basePositions(goodTracks(:,13),9:11));
+tracksDispOrients(:,21) = sqrt(dot(tracksDispOrients(:,18:20),tracksDispOrients(:,18:20),2));

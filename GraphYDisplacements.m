@@ -1,0 +1,14 @@
+fig = figure;
+hold on;
+xlabel('Distance from compression wall (pixels)');
+ylabel('Displacement away from compression wall');
+title('Y-Displacement of beads during second full compression (July 20 run)');
+line([0 500], [0 0]);
+set(fig,'Position',[30,30,1000,800]);
+poiBegin = goodTracks(:,12) == 1793;% & goodTracks(:,3) > 250;% & goodTracks(:,3) < 225;
+poiEnd = goodTracks(:,12) == 1809;
+%poiEnd = [0;0; poiBegin(1:end-2)] == 1;
+scatter(goodTracks(poiBegin,2),goodTracks(poiEnd,2)-goodTracks(poiBegin,2),5,goodTracks(poiBegin,3),'filled');
+c = colorbar('eastoutside');
+c.Label.String = 'z = height in pixels'; 
+c.Label.FontSize = 12;
