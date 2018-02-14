@@ -23,17 +23,8 @@ IMS = thresh_invert(IMS);
 %Test bandpass to get size
 %bpass-jhw cuts off radius*2 from EACH side in x
 %so the x and y dimensions are reduced by !!4*radius!!
-Cr=2*radius;%the amount that the original image is cropped by in x and y on either side by the bandpass
-sbp=size(bpass_jhw(IMS(:,:,1),0,Cr));%form: bpass_jhw(image_array,lnoise,lobject,threshold) Radius*2 is slightly smaller than physical radius*2
-IMSbp=single(zeros(sbp(1),sbp(2),no_images));%IMSbp is a 0matrix with size equal to the size of the bandpassed orignal image
-IMSCr=single(zeros(sbp(1),sbp(2),no_images));
-
-%%
-% Band-filter all images
 disp('a_s: Band-filtering all images');
-for b=1:no_images
-    IMSbp(:,:,b)=single(bpass_jhw(IMS(:,:,b),0,Cr));
-end
+IMSbp=bandpass(radius,IMS);
 
 %% create IMSCr (thresholded bandpassed image)
 %TWEAK THRESHOLD
@@ -89,6 +80,7 @@ s=regionprops(L3,'PixelIdxList', 'PixelList');%s is a struct that holds structs 
 %bandpassed image
 %% 
 % The next step: try adjusting center-finding method
+Cr = 2*radius; %the amount that gets cropped off both sides earlier by bandpass
 Result=zeros(numel(s),11);
 for k = 1:numel(s)%#elements in s (#regions or particles)
     idx = s(k).PixelIdxList;%lin index of all points in region k
@@ -189,4 +181,18 @@ disp('a_s: DONE, the analyze_scan function has ended.');
 disp('***********************************************');
 toc
 out_as=Result(2:length(Result),:);
+
+function out=bandpass(radius,IMS)
+
+s = size(IMS);
+no_images = s(3);
+Cr=2*radius;%the amount that the original image is cropped by in x and y on either side by the bandpass
+sbp=size(bpass_jhw(IMS(:,:,1),0,Cr));%form: bpass_jhw(image_array,lnoise,lobject,threshold) Radius*2 is slightly smaller than physical radius*2
+IMSbp=single(zeros(sbp(1),sbp(2),no_images));%IMSbp is a 0matrix with size equal to the size of the bandpassed orignal image
+
+for b=1:no_images
+    IMSbp(:,:,b)=single(bpass_jhw(IMS(:,:,b),0,Cr));
+end
+
+out=IMSbp;
 
