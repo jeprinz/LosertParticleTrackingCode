@@ -14,39 +14,69 @@ Gauss_sph=single(Gauss_sphere(radius,sigma0,AR_z));
 %Load all images%creates 3d image array and makes a cropped version to
 %line up with final moments
 disp('a_s: Loading and pre-processing images');
+tic
 IMS=load_images_hdf5(start_image,end_image,x1,x2,y1,y2,imagefolder,scan_number);
+toc
+figure(1);
+title('IMS');
+jimage(IMS);
 %%
 %Threshold and invert
+
 disp('a_s: Thresholding and inverting images');
+tic
 IMS = thresh_invert(IMS);
+toc
+figure(2);
+title('thresholded');
+jimage(IMS);
 %%
 
 disp('a_s: Band-filtering all images');
+tic
 IMSbp=bandpass(crop_amount,IMS); %remember bandpass cuts off radius*2 from EACH side in x so the x and y dimensions are reduced by !!4*radius!!
+toc
+figure(3);
+title('bandpassed');
+jimage(IMSbp);
 
 %% create IMSCr (thresholded bandpassed image)
-%TWEAK THRESHOLD
-%IMSCr is an inverted copy of the bandpassed img since IMSbp gets convolved
 thresh_val=1e-5;
-
 IMSCr = IMSbp <= thresh_val;
+figure(4);
+title('IMSCr');
+jimage(IMSCr);
 
 %Convolve
 disp('a_s: Convolving... This may take a while');
+tic
 IMS_convolved = convolve(IMSbp, Gauss_sph);
+toc
+figure(5);
+title('convolved');
+jimage(IMS_convolved);
 
 %% create pkswb (thresholded convolution image)
 disp('a_s: Thresholding');
 %TWEAK THRESHOLD
 disp('using new threshold method');
+tic
 IMS_thresholded = IMS_convolved > 0;
+toc
+figure(6);
+title('IMS_thresholded');
+jimage(IMS_thresholded);
 %%
 disp('a_s: Tagging regions');
+tic
 region_list = label_regions(IMS_thresholded);
-%% 
-
+toc 
+%%
+disp('a_s: Computing result matrix');
+tic
 Result = compute_result(region_list, crop_amount, IMS_convolved, x1, x2, y1, y2, no_images, radius, IMSCr);
-  
+toc  
+
 %%
 disp('a_s: DONE, the analyze_scan function has ended.');
 disp('***********************************************');
