@@ -1,6 +1,6 @@
 
 function jimage(img, isColor)
-
+img = squeeze(img);
 if nargin < 2
     isColor = false;
 end
