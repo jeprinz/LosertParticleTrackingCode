@@ -10,7 +10,6 @@ if ~isColor
     s = size(img);
 
     if length(s) == 3
-    disp(fixed);
         layer = floor(s(3)/2);
         slice = img(:,:,layer);
     else

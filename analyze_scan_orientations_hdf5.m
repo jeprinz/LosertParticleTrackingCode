@@ -50,7 +50,13 @@ jimage(IMSCr);
 %Convolve
 disp('a_s: Convolving... This may take a while');
 tic
-IMS_convolved = convolve(IMSbp, Gauss_sph);
+
+[X, Y, Z] = meshgrid(-radius:radius, -radius:radius, -radius:radius);
+sph = ((X .^ 2 + Y .^ 2 + Z .^ 2) <= radius^2); %sph is a filled in sphere
+sph;
+
+IMS_convolved = convolve(IMSbp, Gauss_sph); %JACOB note: this is how it was
+%IMS_convolved = convolve(~IMSCr, sph);
 toc
 figure(5);
 title('convolved');
@@ -61,7 +67,8 @@ disp('a_s: Thresholding');
 %TWEAK THRESHOLD
 disp('using new threshold method');
 tic
-IMS_thresholded = IMS_convolved > 0;
+IMS_thresholded = IMS_convolved > 0;% JACOB NOTE: this is how it was
+%IMS_thresholded = IMS_convolved > 5000;
 toc
 figure(6);
 title('IMS_thresholded');
@@ -74,8 +81,14 @@ toc
 %%
 disp('a_s: Computing result matrix');
 tic
-Result = compute_result(region_list, crop_amount, IMS_convolved, x1, x2, y1, y2, no_images, radius, IMSCr);
+Result = compute_result(region_list, crop_amount, IMS_convolved, x1, x2, y1, y2, no_images, radius, IMSCr);% JACOB note: this is how it was
+%Result = compute_result(region_list, crop_amount, IMS_thresholded, x1, x2, y1, y2, no_images, radius, IMSCr);
 toc  
+
+with_spheres = draw_spheres(IMS, radius, Result(:,1:3));
+figure(7);
+title("calculated spheres");
+jimage(with_spheres, 1);
 
 %%
 disp('a_s: DONE, the analyze_scan function has ended.');
@@ -127,7 +140,7 @@ idx=find([Resultunf.Area]>=4);%index of all regions with nonzero area
 L2=ismember(L,idx);%output is array with size L of 1's where elements of L are in the set idx~which is just 1:number of regions. Therefore it converts all tagged regions to all 1's
 L3=bwlabeln(L2);% L3 now retaggs (L3=old L2)
 %%
-disp('a_s: Determining weighted centroid locations and orientations');
+%disp('a_s: Determining weighted centroid locations and orientations');
 region_list=regionprops(L3,'PixelIdxList', 'PixelList');%s is a struct that holds structs for each tagged 
 out = region_list;
 

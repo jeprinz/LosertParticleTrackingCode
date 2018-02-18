@@ -1,8 +1,10 @@
 
 imagefolder ='/home/jacob/development/GransOfSand/'; % folder within which images are saved;
 
-start_image=200;%these are the images corresponding to each z slice in a single frame (NOTE: z-slices start with index 0)
-end_image=400;%last z slice (top)
+%start_image=200;%these are the images corresponding to each z slice in a single frame (NOTE: z-slices start with index 0)
+%end_image=400;%last z slice (top)
+start_image = 300;
+end_image = 301;
 x1=200; %these are limits of the region of interest
 x2=400;
 y1=200;
