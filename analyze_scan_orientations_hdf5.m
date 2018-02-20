@@ -53,7 +53,6 @@ tic
 
 [X, Y, Z] = meshgrid(-radius:radius, -radius:radius, -radius:radius);
 sph = ((X .^ 2 + Y .^ 2 + Z .^ 2) <= radius^2); %sph is a filled in sphere
-sph;
 
 IMS_convolved = convolve(IMSbp, Gauss_sph); %JACOB note: this is how it was
 %IMS_convolved = convolve(~IMSCr, sph);
@@ -85,7 +84,18 @@ Result = compute_result(region_list, crop_amount, IMS_convolved, x1, x2, y1, y2,
 %Result = compute_result(region_list, crop_amount, IMS_thresholded, x1, x2, y1, y2, no_images, radius, IMSCr);
 toc  
 
+%JACOB NOTE: for some reason X and Y are being transposed in the label regions function, so I'm putting in this stupid fix here:
+Result(:,11) = Result(:,1);
+Result(:,1) = Result(:,2);
+Result(:,2) = Result(:,11);
+
+%JACOB NOTE: commenting and replace the following line for testing.
 with_spheres = draw_spheres(IMS, radius, Result(:,1:3));
+
+%replace with this:
+%positions = test_calc_positions(region_list);
+%with_spheres = draw_spheres(IMS_thresholded, radius, positions);
+
 figure(7);
 title("calculated spheres");
 jimage(with_spheres, 1);
@@ -111,7 +121,7 @@ for b=1:no_images
 end
 
 out=IMSbp;
-
+%%
 
 function out=convolve(IMSbp, Gauss_sph)
 splits = 5; %has to do with RAM constraints on jcorr3d function
@@ -131,7 +141,8 @@ if sIMSCr~=sC
     return
 end
 out = Convol;
-
+%%
+%NOTE: this function returns the X and Y swapped from what the should be.
 function out = label_regions(IMSthresholded)
 L=bwlabeln(IMSthresholded);%output is an array with size of IMSthresholded where all touching pixels in the 3d array have the same id number, an integer)
 disp('a_s: Imposing Volume minimum of 4');
@@ -139,10 +150,21 @@ Resultunf=regionprops(L,'Area');%[NOTE L is array of TAGGED regions]; creates st
 idx=find([Resultunf.Area]>=4);%index of all regions with nonzero area
 L2=ismember(L,idx);%output is array with size L of 1's where elements of L are in the set idx~which is just 1:number of regions. Therefore it converts all tagged regions to all 1's
 L3=bwlabeln(L2);% L3 now retaggs (L3=old L2)
-%%
+
 %disp('a_s: Determining weighted centroid locations and orientations');
-region_list=regionprops(L3,'PixelIdxList', 'PixelList');%s is a struct that holds structs for each tagged 
+region_list=regionprops(L3,'PixelIdxList', 'PixelList');%s is a struct that holds structs for each tagged
 out = region_list;
+%%
+
+function out = test_calc_positions(region_list)
+Result=zeros(numel(region_list),3);
+for k = 1:numel(region_list)%#elements in regions_list (#regions or particles)
+    x = region_list(k).PixelList(:, 1);%the list of x-coords of all points in the region k WITH RESPECT TO the bandpassed image
+    y = region_list(k).PixelList(:, 2);
+    z = region_list(k).PixelList(:, 3);
+    Result(k,1:3) = [mean(x), mean(y), mean(z)];
+end
+out = Result;
 
 
 function out = compute_result(region_list, crop_amount, IMS_convolved, x1, x2, y1, y2, no_images, radius, IMSCr)
@@ -212,7 +234,7 @@ for k = 1:numel(region_list)%#elements in regions_list (#regions or particles)
     Covmat=[CoXX,CoXY,CoXZ;CoXY,CoYY,CoYZ;CoXZ,CoYZ,CoZZ];
     if max(max(isnan(Covmat)))==1;%checks if any element of covmat is NAN==1
       
-         Result(k,9:11)=NaN(1,3);sum
+         Result(k,9:11)=NaN(1,3);
         continue
     else
         [V,D] = eig(Covmat);
@@ -224,3 +246,4 @@ for k = 1:numel(region_list)%#elements in regions_list (#regions or particles)
     Result(k,9:11)=Result(k,9:11)./M3;
 end
 out = Result;
+%%

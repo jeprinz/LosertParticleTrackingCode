@@ -20,7 +20,6 @@ for i=1:size(locations,1)
    highy = min(radius, dim(2) - y - 1);
    lowz = min(radius, z - 1);
    highz = min(radius, dim(3) - z - 1);
-
    patch = max(res(x-lowx+1:x+highx+1, y-lowy+1:y+highy+1, z-lowz+1:z+highz+1,1), ...
        sph(radius+1-lowx:radius+1+highx, radius+1-lowy:radius+1+highy, radius+1-lowz:radius+1+highz)*redval);
    res(x-lowx+1:x+highx+1, y-lowy+1:y+highy+1, z-lowz+1:z+highz+1,1) = patch;
