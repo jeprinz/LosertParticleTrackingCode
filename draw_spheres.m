@@ -7,7 +7,7 @@ res = zeros(dim(1), dim(2), dim(3), 3);
 res(:,:,:,1) = IMG;
 res(:,:,:,2) = IMG;
 res(:,:,:,3) = IMG;
-redval = max(max(max(max(IMG)))*1.5,1);
+redval = max(mean(mean(mean(IMG)))*2,1);
 
 for i=1:size(locations,1)
    loc = locations(i,:);
