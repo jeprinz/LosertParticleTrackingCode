@@ -1,0 +1,32 @@
+<!-- saved from url=(0014)about:internet -->
+<html>
+<body>
+<script src="resources/eml_report_loadable_data.js"></script>
+<pre class="code">
+<span class="srcline"><span class="lineno"><a href="25,1" id="srcline1"> 1</a></span><span class="line"><span class="keyword">function</span> <span class="var type1" id="S2T32U3">f</span> = fftn(<span class="var type1" id="S3T10U6">x</span>,<span class="var type0" id="S4T0U7">siz</span>)</span></span>
+<span class="srcline"><span class="lineno"><a href="25,2" id="srcline2"> 2</a></span><span class="line"><span class="comment">%MATLAB Code Generation Library Function</span></span></span>
+<span class="srcline"><span class="lineno"><a href="25,3" id="srcline3"> 3</a></span><span class="line"></span></span>
+<span class="srcline"><span class="lineno"><a href="25,4" id="srcline4"> 4</a></span><span class="line"><span class="comment">% Limitations:</span></span></span>
+<span class="srcline"><span class="lineno"><a href="25,5" id="srcline5"> 5</a></span><span class="line"><span class="comment">%  1. siz must be fixed-size</span></span></span>
+<span class="srcline"><span class="lineno"><a href="25,6" id="srcline6"> 6</a></span><span class="line"></span></span>
+<span class="srcline"><span class="lineno"><a href="25,7" id="srcline7"> 7</a></span><span class="line"><span class="comment">%   Copyright 1984-2017 The MathWorks, Inc.</span></span></span>
+<span class="srcline"><span class="lineno"><a href="25,8" id="srcline8"> 8</a></span><span class="line"><span class="comment">%#codegen</span></span></span>
+<span class="srcline"><span class="lineno"><a href="25,9" id="srcline9"> 9</a></span><span class="line"></span></span>
+<span class="srcline"><span class="lineno"><a href="25,10" id="srcline10">10</a></span><span class="line">coder.internal.assert(nargin &gt; 0, <span class="keyword">...</span></span></span>
+<span class="srcline"><span class="lineno"><a href="25,11" id="srcline11">11</a></span><span class="line">    <span class="string">'MATLAB:minrhs'</span>);</span></span>
+<span class="srcline"><span class="lineno"><a href="25,12" id="srcline12">12</a></span><span class="line"><span class="mxinfo " id="T7:U3"><span class="var type0" id="S7T0U22">ONE</span> = <span class="mxinfo " id="T7:U4">ones(coder.internal.indexIntClass)</span></span>;</span></span>
+<span class="srcline"><span class="lineno"><a href="25,13" id="srcline13">13</a></span><span class="line"><span class="mxinfo " id="T7:U5"><span class="var type0" id="S9T0U32">TWO</span> = <span class="mxinfo " id="T7:U6">cast(2,coder.internal.indexIntClass)</span></span>;</span></span>
+<span class="srcline"><span class="lineno"><a href="25,14" id="srcline14">14</a></span><span class="line"><span class="keyword">if</span> nargin == 1</span></span>
+<span class="srcline"><span class="lineno"><a href="25,15" id="srcline15">15</a></span><span class="line">    <span class="mxinfo " id="T32:U7"><span class="var type1" id="S2T32U49">f</span> = <span class="mxinfo " id="T32:U9">fft(<span class="var type1" id="S3T10U52">x</span>,[],<span class="var type0" id="S7T0U55">ONE</span>)</span></span>;</span></span>
+<span class="srcline"><span class="lineno"><a href="25,16" id="srcline16">16</a></span><span class="line"><span class="keyword">else</span></span></span>
+<span class="srcline"><span class="lineno"><a href="25,17" id="srcline17">17</a></span><span class="line">    coder.internal.prefer_const(<span class="var type0" id="S4T0U64">siz</span>);</span></span>
+<span class="srcline"><span class="lineno"><a href="25,18" id="srcline18">18</a></span><span class="line">    coder.internal.assert(numel(<span class="var type0" id="S4T0U75">siz</span>) &gt;= ndims(<span class="var type0" id="S3T0U78">x</span>), <span class="keyword">...</span></span></span>
+<span class="srcline"><span class="lineno"><a href="25,19" id="srcline19">19</a></span><span class="line">        <span class="string">'Coder:MATLAB:fftfcn_outputSizeLessThanNdimsElements'</span>);</span></span>
+<span class="srcline"><span class="lineno"><a href="25,20" id="srcline20">20</a></span><span class="line">    <span class="var type0" id="S2T0U82">f</span> = fft(eml_pad_array(<span class="var type0" id="S3T0U87">x</span>,<span class="var type0" id="S4T0U88">siz</span>),[],<span class="var type0" id="S7T0U91">ONE</span>);</span></span>
+<span class="srcline"><span class="lineno"><a href="25,21" id="srcline21">21</a></span><span class="line"><span class="keyword">end</span></span></span>
+<span class="srcline"><span class="lineno"><a href="25,22" id="srcline22">22</a></span><span class="line"><span class="keyword">for</span> <span class="var type0" id="S15T0U94">dim</span> = coder.unroll(<span class="var type1" id="S9T7U100">TWO</span>:eml_ndims(<span class="var type1" id="S2T32U103">f</span>))</span></span>
+<span class="srcline"><span class="lineno"><a href="25,23" id="srcline23">23</a></span><span class="line">    <span class="mxinfo " id="T32:U13"><span class="var type1" id="S2T32U106"><span class="message error" id="M7F342C">f</span></span></span> = <span class="mxinfo " id="T33:U14">fft(<span class="var type1" id="S2T32U109">f</span>,[],<span class="var type0" id="S15T0U112">dim</span>)</span>;</span></span>
+<span class="srcline"><span class="lineno"><a href="25,24" id="srcline24">24</a></span><span class="line"><span class="keyword"><span class="keyword">end</span></span></span></span>
+</pre>
+</body>
+</html>

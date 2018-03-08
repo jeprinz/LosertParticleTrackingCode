@@ -19,6 +19,7 @@ count_index = [dx dy no_images];
 IMSr = h5read(file,datasetname,start_index,count_index);
 
 %Permute into matlab stupid y,x,z...
-IMS = double(permute(IMSr,[2 1 3]));
+%IMS = double(permute(IMSr,[2 1 3])); %JACOB NOTE: this is how it was
+IMS = permute(IMSr,[2 1 3]); %JACOB NOTE: this is how it was
 
 out=IMS;

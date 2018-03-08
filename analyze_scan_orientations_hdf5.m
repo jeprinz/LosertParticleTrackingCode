@@ -62,7 +62,6 @@ toc
 disp('a_s: Tagging regions');
 tic
 region_list = label_regions(IMS_thresholded);
-toc(start_time)
 
 %%
 disp('a_s: Computing result matrix');
