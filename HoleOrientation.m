@@ -12,8 +12,9 @@ radius = round(radius);
 
 imgSize = size(image);
 
-if x < 0 || y < 0 || z < 0 || x > imgSize(1) || y > imgSize(2) || z > imgSize(3)
-    disp("bead center outside of image dimentions...");
+padding = radius + 1;
+if x < padding || y < padding || z < padding || x > imgSize(1) - padding || y > imgSize(2) - padding || z > imgSize(3) - padding
+    disp("bead center outside of image dimentions or to close to edge...");
     out=false;
     return
 end
@@ -23,13 +24,7 @@ end
 mask = (X .^ 2 + Y .^ 2 + Z .^ 2) <= (radius * .8)^2; %sph is a filled in sphere
 mask = mask & (X.^2 + Y.^2 + Z.^2) >= (radius / 2)^2; %remove smaller sphere inside
 
-padding = radius+1;
-paddedImage = ones(imgSize(1) + 2*padding, imgSize(2) + 2*padding, imgSize(3) + 2*padding);
-paddedImage(padding+1:imgSize(1)+padding, padding+1:imgSize(2)+padding, padding+1:imgSize(3)+padding) = image;
-padX = x + padding;
-padY = y + padding;
-padZ = z + padding;
-sphereImage = paddedImage(padX-radius:padX+radius, padY-radius:padY+radius, padZ-radius:padZ+radius);
+sphereImage = image(x-radius:x+radius, y-radius:y+radius, z-radius:z+radius);
 
 sections = ~sphereImage & mask;
 jimage(sections);

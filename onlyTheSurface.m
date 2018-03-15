@@ -13,3 +13,4 @@ edges = IMG & (circshift(inv, [1 0 0]) | ... %these lines keep only the border o
                circshift(inv, [0 1 0]) | ...
                circshift(inv, [0 1 0]));
 out = edges;
+end
