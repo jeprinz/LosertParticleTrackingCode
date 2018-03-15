@@ -50,8 +50,8 @@ else
     end
 
     correspond = zeros(numPieces, numPieces);
-    for i = [1 2 3 4]
-        for j = [1 2 3 4]
+    for i = 1:numPieces
+        for j = numPieces
             correspond(i,j) = sum(direction(i,:) .* direction(j,:)); %dot product of ith and jth vector
         end
     end

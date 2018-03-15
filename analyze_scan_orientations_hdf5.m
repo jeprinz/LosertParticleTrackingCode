@@ -65,7 +65,7 @@ region_list = label_regions(IMS_thresholded);
 
 %%
 disp('a_s: Computing result matrix');
-Result = compute_result(region_list, crop_amount, IMS_convolved, radius, IMSCr);% JACOB note: this is how it was
+Result = compute_result(region_list, crop_amount, IMSCr, radius);% JACOB note: this is how it was
 %Result = compute_result(region_list, crop_amount, IMS_thresholded, x1, x2, y1, y2, no_images, radius, IMSCr);
 time_label_regions = toc;
 
@@ -73,12 +73,14 @@ time_label_regions = toc;
 Result(:,11) = Result(:,1);
 Result(:,1) = Result(:,2);
 Result(:,2) = Result(:,11);
+%TODO: really fix the above
+%TODO TODO: really really pls fix it
 
 disp("Total processing time:")
 total_time = toc(start_time);
 
 %JACOB NOTE: commenting and replace the following line for testing.
-with_spheres = draw_beads(IMS, radius, Result(:,1:3));
+with_spheres = draw_beads(IMS, radius, Result);
 
 %replace with this:
 %positions = test_calc_positions(region_list);
@@ -149,12 +151,12 @@ out = region_list;
 %%
 
 %Takes regions of image and computes final result with positions and orientations of beads.
-function out = compute_result(region_list, crop_amount, IMS_convolved, radius, IMSCr)
+function out = compute_result(region_list, crop_amount, IMSCr, radius)
     
 Result=zeros(numel(region_list),11);
 for k = 1:numel(region_list)%#elements in regions_list (#regions or particles)
     idx = region_list(k).PixelIdxList;%lin index of all points in region k
-    pixel_values = double(IMS_convolved(idx)+.0001);%list of values of the pixels in convol which has size of idx
+    pixel_values = double(IMSCr(idx)+.0001);%list of values of the pixels in convol which has size of idx
     sum_pixel_values = sum(pixel_values);   
     x = region_list(k).PixelList(:, 1);%the list of x-coords of all points in the region k WITH RESPECT TO the bandpassed image
     y = region_list(k).PixelList(:, 2);
@@ -164,7 +166,7 @@ for k = 1:numel(region_list)%#elements in regions_list (#regions or particles)
     zbar = sum(z .* pixel_values)/sum_pixel_values;%adding Cr above brings back to IMS
     Result(k,1:3) = [xbar ybar zbar];%centroids; x1 and y1 are the coords of the top left corner of region of interest(in the original image)
     
-    cylResult = HoleOrientation(IMS_convolved, [xbar-crop_amount ybar-crop_amount zbar-crop_amount], radius, 1);
+    cylResult = HoleOrientation(IMSCr, [xbar-crop_amount ybar-crop_amount zbar-crop_amount], radius, 1);
     if cylResult ~= false
         Result(k, 4) = 1; %Says that there was a cylinder found
         avgDirection = (cylResult(1,:) + cylResult(2,:)) / 2;

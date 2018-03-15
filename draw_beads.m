@@ -30,7 +30,12 @@ redval = max(mean(mean(mean(IMG)))*2,1);
 
 for i=1:size(locations,1)
    loc = locations(i,:);
-    DrawOntoImage(sph, loc);
+   DrawOntoImage(sph, loc);
+   if locations(i,4)
+       direction = locations(i, 5:7);
+       cyl = onlyTheSurface(Cylinder(radius, radius * .3, direction));
+       DrawOntoImage(cyl, loc);
+   end
 end
 
 out = res;
