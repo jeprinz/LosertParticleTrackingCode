@@ -59,8 +59,7 @@ else
     THRESHOLD = 0.1; %out of 1, how closely should things be measured
     
     findOpposites = correspond < (-1 + THRESHOLD);
-    
-    
+
     out = direction;
 
 end

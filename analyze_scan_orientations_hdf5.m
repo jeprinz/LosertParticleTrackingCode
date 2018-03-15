@@ -69,22 +69,11 @@ Result = compute_result(region_list, crop_amount, IMSCr, radius);% JACOB note: t
 %Result = compute_result(region_list, crop_amount, IMS_thresholded, x1, x2, y1, y2, no_images, radius, IMSCr);
 time_label_regions = toc;
 
-%JACOB NOTE: for some reason X and Y are being transposed in the label regions function, so I'm putting in this stupid fix here:
-Result(:,11) = Result(:,1);
-Result(:,1) = Result(:,2);
-Result(:,2) = Result(:,11);
-%TODO: really fix the above
-%TODO TODO: really really pls fix it
-
 disp("Total processing time:")
 total_time = toc(start_time);
 
 %JACOB NOTE: commenting and replace the following line for testing.
 with_spheres = draw_beads(IMS, radius, Result);
-
-%replace with this:
-%positions = test_calc_positions(region_list);
-%with_spheres = draw_spheres(IMS_thresholded, radius, positions);
 
 figure(1);
 title("calculated spheres");
@@ -98,6 +87,7 @@ pie([time_threshold, time_bandpass, time_convolve, time_label_regions, other_tim
 %%
 disp('a_s: DONE, the analyze_scan function has ended.');
 disp('***********************************************');
+
 out_as=Result(2:length(Result),:);
 
 %% The folowing functions are helpers to the above, which do the individual processing steps
@@ -161,12 +151,16 @@ for k = 1:numel(region_list)%#elements in regions_list (#regions or particles)
     x = region_list(k).PixelList(:, 1);%the list of x-coords of all points in the region k WITH RESPECT TO the bandpassed image
     y = region_list(k).PixelList(:, 2);
     z = region_list(k).PixelList(:, 3);
-    xbar = sum(x .* pixel_values)/sum_pixel_values + crop_amount;%PLUS Cr BECAUSE
-    ybar = sum(y .* pixel_values)/sum_pixel_values + crop_amount;%I CUT OFF Cr OF THE IMAGE DURING BANDPASS!(in x and y only) AND cropped kernelradius/2 off each side (in x,y,z)(but it was put back)                                                         %cropped radius/2 of each side
+    ybar = sum(x .* pixel_values)/sum_pixel_values + crop_amount;%PLUS Cr BECAUSE
+    xbar = sum(y .* pixel_values)/sum_pixel_values + crop_amount;%I CUT OFF Cr OF THE IMAGE DURING BANDPASS!(in x and y only) AND cropped kernelradius/2 off each side (in x,y,z)(but it was put back)                                                         %cropped radius/2 of each side
     zbar = sum(z .* pixel_values)/sum_pixel_values;%adding Cr above brings back to IMS
     Result(k,1:3) = [xbar ybar zbar];%centroids; x1 and y1 are the coords of the top left corner of region of interest(in the original image)
     
-    cylResult = HoleOrientation(IMSCr, [xbar-crop_amount ybar-crop_amount zbar-crop_amount], radius, 1);
+    %VITALLY IMPORTANT NOTE: above, ybar and xbar are switched. I don't
+    %know why, but this needs to be done (presumably they were accedentally
+    %swapped earlier?)
+    
+    cylResult = HoleOrientation(IMSCr, [xbar-crop_amount ybar-crop_amount zbar], radius, 1);
     if cylResult ~= false
         Result(k, 4) = 1; %Says that there was a cylinder found
         avgDirection = (cylResult(1,:) + cylResult(2,:)) / 2;
