@@ -1,4 +1,7 @@
-function out = draw_spheres(IMG, radius, locations)
+%locations is 7 column matrix, where first 3 are bead locations, the fourth column is a binary
+%value "should I draw a cylider for this bead" and last three are cylider
+%direction ve
+function out = draw_beads(IMG, radius, locations)
 
 sph = sphere(radius);
 

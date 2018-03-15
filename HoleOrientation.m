@@ -1,18 +1,27 @@
 %finds the orientation of the two holes in the bead. image is a 3d image
 %array, center is [x y z] center of the sphere
 %radius is the radius of the sphere
-function out = TwoHoleOrientation(image, center, radius)
+function out = HoleOrientation(image, center, radius, numHoles)
 
-x = center(1);%store these for convenience
-y = center(2);
-z = center(3);
+numPieces = numHoles * 2;
+
+x = round(center(1));%store these for convenience
+y = round(center(2));
+z = round(center(3));% TODO: think about subpixel, so dont have to round
+radius = round(radius);
 
 %create a mash which is a sphere with a smaller sphere cut out
 [X, Y, Z] = meshgrid(-radius:radius, -radius:radius, -radius:radius);
-mask = (X .^ 2 + Y .^ 2 + Z .^ 2) <= radius^2; %sph is a filled in sphere
+mask = (X .^ 2 + Y .^ 2 + Z .^ 2) <= (radius * .8)^2; %sph is a filled in sphere
 mask = mask & (X.^2 + Y.^2 + Z.^2) >= (radius / 2)^2; %remove smaller sphere inside
 
-sphereImage = image(x-radius:x+radius, y-radius:y+radius, z-radius:z+radius);
+imgSize = size(image);
+paddedImage = ones(imgSize(1) + 2*radius, imgSize(2) + 2*radius, imgSize(3) + 2*radius);
+paddedImage(radius+1:size(1)+radius, radius+1:size(2)+radius, radius+1:size(3)+radius) = image;
+padX = x + radius;
+padY = y + radius;
+padZ = z + radius;
+sphereImage = paddedImage(padX-radius:padX+radius, padY-radius:padY+radius, padZ-radius:padZ+radius);
 
 sections = ~sphereImage & mask;
 jimage(sections);
@@ -20,15 +29,15 @@ jimage(sections);
 CC = bwconncomp(sections); %label regions
 S = regionprops(CC,'Centroid'); %find centroid of each region
 
-if length(S) ~= 4 %If image processing went properly, we should have 4 regions
+if length(S) ~= numPieces %If image processing went properly, we should have 4 regions
     out = false;
 else
     
-    direction = zeros(4,3);
+    direction = zeros(numPieces,3);
     %We will flip vectors with negative X over origin, so they are all in half space in front of YZ plane. We can do this because two positions flipped
     %around origin correspond to same direction of hole.
 
-    for i = [1 2 3 4]
+    for i = 1:numPieces
         vector = S(i).Centroid - [radius+1 radius+1 radius+1];
         vector = vector ./ sqrt(sum(vector.^2)); %normalize
         direction(i,:) = vector;
@@ -37,7 +46,7 @@ else
         %end
     end
 
-    correspond = zeros(4,4);
+    correspond = zeros(numPieces, numPieces);
     for i = [1 2 3 4]
         for j = [1 2 3 4]
             correspond(i,j) = sum(direction(i,:) .* direction(j,:)); %dot product of ith and jth vector
