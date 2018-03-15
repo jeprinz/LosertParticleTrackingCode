@@ -26,7 +26,7 @@ mask = mask & (X.^2 + Y.^2 + Z.^2) >= (radius / 2)^2; %remove smaller sphere ins
 
 sphereImage = image(x-radius:x+radius, y-radius:y+radius, z-radius:z+radius);
 
-sections = ~sphereImage & mask;
+sections = sphereImage & mask;
 jimage(sections);
 
 CC = bwconncomp(sections); %label regions

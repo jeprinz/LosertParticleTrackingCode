@@ -163,7 +163,7 @@ for k = 1:numel(region_list)%#elements in regions_list (#regions or particles)
     cylResult = HoleOrientation(IMSCr, [xbar-crop_amount ybar-crop_amount zbar], radius, 1);
     if cylResult ~= false
         Result(k, 4) = 1; %Says that there was a cylinder found
-        avgDirection = (cylResult(1,:) + cylResult(2,:)) / 2;
+        avgDirection = (cylResult(1,:) - cylResult(2,:)) / 2; %this is an average. minus because they are oposite directions.
         Result(k, 5:7) = avgDirection;
     else
         Result(k, 4) = 0; %Says no cylinder found
