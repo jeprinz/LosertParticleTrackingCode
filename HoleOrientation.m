@@ -10,17 +10,25 @@ y = round(center(2));
 z = round(center(3));% TODO: think about subpixel, so dont have to round
 radius = round(radius);
 
+imgSize = size(image);
+
+if x < 0 || y < 0 || z < 0 || x > imgSize(1) || y > imgSize(2) || z > imgSize(3)
+    disp("bead center outside of image dimentions...");
+    out=false;
+    return
+end
+
 %create a mash which is a sphere with a smaller sphere cut out
 [X, Y, Z] = meshgrid(-radius:radius, -radius:radius, -radius:radius);
 mask = (X .^ 2 + Y .^ 2 + Z .^ 2) <= (radius * .8)^2; %sph is a filled in sphere
 mask = mask & (X.^2 + Y.^2 + Z.^2) >= (radius / 2)^2; %remove smaller sphere inside
 
-imgSize = size(image);
-paddedImage = ones(imgSize(1) + 2*radius, imgSize(2) + 2*radius, imgSize(3) + 2*radius);
-paddedImage(radius+1:size(1)+radius, radius+1:size(2)+radius, radius+1:size(3)+radius) = image;
-padX = x + radius;
-padY = y + radius;
-padZ = z + radius;
+padding = radius+1;
+paddedImage = ones(imgSize(1) + 2*padding, imgSize(2) + 2*padding, imgSize(3) + 2*padding);
+paddedImage(padding+1:imgSize(1)+padding, padding+1:imgSize(2)+padding, padding+1:imgSize(3)+padding) = image;
+padX = x + padding;
+padY = y + padding;
+padZ = z + padding;
 sphereImage = paddedImage(padX-radius:padX+radius, padY-radius:padY+radius, padZ-radius:padZ+radius);
 
 sections = ~sphereImage & mask;

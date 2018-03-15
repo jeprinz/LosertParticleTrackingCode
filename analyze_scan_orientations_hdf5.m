@@ -164,8 +164,8 @@ for k = 1:numel(region_list)%#elements in regions_list (#regions or particles)
     zbar = sum(z .* pixel_values)/sum_pixel_values;%adding Cr above brings back to IMS
     Result(k,1:3) = [xbar ybar zbar];%centroids; x1 and y1 are the coords of the top left corner of region of interest(in the original image)
     
-    cylResult = HoleOrientation(IMS_convolved, [xbar ybar zbar], radius, 1);
-    if cylResult ~= False
+    cylResult = HoleOrientation(IMS_convolved, [xbar-crop_amount ybar-crop_amount zbar-crop_amount], radius, 1);
+    if cylResult ~= false
         Result(k, 4) = 1; %Says that there was a cylinder found
         avgDirection = (cylResult(1,:) + cylResult(2,:)) / 2;
         Result(k, 5:7) = avgDirection;
