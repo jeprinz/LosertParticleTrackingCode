@@ -13,24 +13,37 @@ radius = round(radius);
 imgSize = size(image);
 
 padding = radius + 1;
-if x < padding || y < padding || z < padding || x > imgSize(1) - padding || y > imgSize(2) - padding || z > imgSize(3) - padding
-    disp("bead center outside of image dimentions or to close to edge...");
-    out=false;
-    return
-end
+width = 2*radius+1;
 
 %create a mash which is a sphere with a smaller sphere cut out
 [X, Y, Z] = meshgrid(-radius:radius, -radius:radius, -radius:radius);
 mask = (X .^ 2 + Y .^ 2 + Z .^ 2) <= (radius * .8)^2; %sph is a filled in sphere
 mask = mask & (X.^2 + Y.^2 + Z.^2) >= (radius / 2)^2; %remove smaller sphere inside
 
-sphereImage = image(x-radius:x+radius, y-radius:y+radius, z-radius:z+radius);
+%sphereImage = image(x-radius:x+radius, y-radius:y+radius, z-radius:z+radius);
+
+sphereImage = zeros(width, width, width);
+lowx = min(radius, x - 1);
+highx = min(radius, imgSize(1) - x - 1);
+lowy = min(radius, y - 1);
+highy = min(radius, imgSize(2) - y - 1);
+lowz = min(radius, z - 1);
+highz = min(radius, imgSize(3) - z - 1);
+patch = image(x-lowx:x+highx, y-lowy:y+highy, z-lowz:z+highz);
+sphereImage(radius+1-lowx:width-radius+highx, radius+1-lowy:width-radius+highy, radius+1-lowz:width-radius+highz) = patch;
+
 
 sections = sphereImage & mask;
-jimage(sections);
 
 CC = bwconncomp(sections); %label regions
-S = regionprops(CC,'Centroid'); %find centroid of each region
+S = regionprops(CC,'Centroid','Area'); %find centroid of each region
+bigRegions = [S.Area] > 5; % keep only relatively big areas
+GoodRegions = S(bigRegions);
+
+
+if x < 50 && z > 30 && numPieces ~= length(GoodRegions)
+    disp('here it is');
+end
 
 if length(S) ~= numPieces %If image processing went properly, we should have 4 regions
     out = false;

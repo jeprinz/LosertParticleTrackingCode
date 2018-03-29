@@ -8,22 +8,34 @@ numPieces = numHoles * 2;
 x = round(center(1));%store these for convenience
 y = round(center(2));
 z = round(center(3));% TODO: think about subpixel, so dont have to round
+radius = round(radius);
+
+imgSize = size(image);
+
+padding = radius + 1;
+if x < padding || y < padding || z < padding || x > imgSize(1) - padding || y > imgSize(2) - padding || z > imgSize(3) - padding
+    disp("bead center outside of image dimentions or to close to edge...");
+    out=false;
+    return
+end
 
 %create a mash which is a sphere with a smaller sphere cut out
 [X, Y, Z] = meshgrid(-radius:radius, -radius:radius, -radius:radius);
 mask = (X .^ 2 + Y .^ 2 + Z .^ 2) <= (radius * .8)^2; %sph is a filled in sphere
 mask = mask & (X.^2 + Y.^2 + Z.^2) >= (radius / 2)^2; %remove smaller sphere inside
 
-imgSize = size(image);
-paddedImage = ones(imgSize(1) + 2*radius, imgSize(2) + 2*radius, imgSize(3) + 2*radius);
-paddedImage(radius+1:size(1)+radius, radius+1:size(2)+radius, r)
 sphereImage = image(x-radius:x+radius, y-radius:y+radius, z-radius:z+radius);
 
-sections = ~sphereImage & mask;
+sections = sphereImage & mask;
 jimage(sections);
 
 CC = bwconncomp(sections); %label regions
-S = regionprops(CC,'Centroid'); %find centroid of each region
+S = regionprops(CC,'Centroid','Area'); %find centroid of each region
+num
+
+if x < 50 && z > 30 && numPieces ~= length(S)
+    disp('here it is');
+end
 
 if length(S) ~= numPieces %If image processing went properly, we should have 4 regions
     out = false;
@@ -43,8 +55,8 @@ else
     end
 
     correspond = zeros(numPieces, numPieces);
-    for i = [1 2 3 4]
-        for j = [1 2 3 4]
+    for i = 1:numPieces
+        for j = numPieces
             correspond(i,j) = sum(direction(i,:) .* direction(j,:)); %dot product of ith and jth vector
         end
     end
@@ -52,8 +64,7 @@ else
     THRESHOLD = 0.1; %out of 1, how closely should things be measured
     
     findOpposites = correspond < (-1 + THRESHOLD);
-    
-    
+
     out = direction;
 
 end
